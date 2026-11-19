@@ -1,0 +1,28 @@
+# Visual Studio build output
+bin/
+obj/
+.vs/
+*.vcxproj.user
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.VC.opendb
+ipch/
+
+# Common build byproducts
+*.obj
+*.pdb
+*.ilk
+*.log
+*.exe
+*.lib
+*.exp
+
+# Editor / tooling
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# OS cruft
+Thumbs.db
+desktop.ini
