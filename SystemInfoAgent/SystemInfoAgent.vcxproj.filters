@@ -16,9 +16,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Command.h">
-      <Filter>src\cli</Filter>
-    </ClCompile>
     <ClCompile Include="commandParser.cpp">
       <Filter>src\cli</Filter>
     </ClCompile>
@@ -39,6 +36,15 @@
     </ClInclude>
     <ClInclude Include="ProcessInfo.h">
       <Filter>src\procinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessEnumerator.h">
+      <Filter>src\procinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="WinHandle.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>src\cli</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
