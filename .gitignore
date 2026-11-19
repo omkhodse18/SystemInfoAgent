@@ -26,3 +26,10 @@ ipch/
 # OS cruft
 Thumbs.db
 desktop.ini
+
+# Per-project VS build output (default OutDir/IntDir layout)
+x64/
+x86/
+Debug/
+Release/
+*.tlog/
