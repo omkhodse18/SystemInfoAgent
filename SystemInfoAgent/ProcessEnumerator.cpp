@@ -104,7 +104,27 @@ namespace SystemInfoAgent::procinfo {
 
         void queryVersionInfo(const std::wstring& path, std::wstring& companyName, std::wstring& fileDescription);
         std::wstring queryOwningUser(DWORD pid);
-        uint64_t queryMemoryUsageKb(DWORD pid);
+
+
+        uint64_t queryMemoryUsageKb(DWORD pid)
+        {
+            UniqueHandle process(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, pid));
+
+            if (!process.valid())
+            {
+                return 0;
+            }
+
+            PROCESS_MEMORY_COUNTERS_EX counter{};
+            DWORD dwSize = sizeof(counter);
+
+            if (!::GetProcessMemoryInfo(process.get(), reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&counter), dwSize))
+            {
+                return 0;
+            }
+
+            return ( (static_cast<uint64_t>(counter.WorkingSetSize)) / 1024 );
+        }
 
 
         // queryImagePath - Get full process path
@@ -167,8 +187,8 @@ namespace SystemInfoAgent::procinfo {
             ProcessInfo info;
             info.pid = entry.th32ProcessID;
             info.name = entry.szExeFile;
-            info.path = queryImagePath(entry.th32ProcessID);
-            info.memoryUsageKb = queryMemoryUsageKb(entry.th32ProcessID);
+            info.path = queryImagePath(entry.th32ProcessID);                // gets exe path
+            info.memoryUsageKb = queryMemoryUsageKb(entry.th32ProcessID);   // Memory usage in kb
             info.userName = queryOwningUser(entry.th32ProcessID);
             info.isCritical = setCriticalProcesses.count(toUpper(info.name)) > 0;
 
