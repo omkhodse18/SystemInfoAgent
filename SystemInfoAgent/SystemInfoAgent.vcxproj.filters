@@ -26,6 +26,15 @@
     <ClCompile Include="ProcessEnumerator.cpp">
       <Filter>src\procinfo</Filter>
     </ClCompile>
+    <ClCompile Include="ProcessActions.cpp">
+      <Filter>src\procinfo</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistryKey.cpp">
+      <Filter>src\core</Filter>
+    </ClCompile>
+    <ClCompile Include="ServiceControl.cpp">
+      <Filter>src\procinfo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="commandParser.h">
@@ -45,6 +54,15 @@
     </ClInclude>
     <ClInclude Include="Command.h">
       <Filter>src\cli</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessActions.h">
+      <Filter>src\procinfo</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistryKey.h">
+      <Filter>src\core</Filter>
+    </ClInclude>
+    <ClInclude Include="ServiceControl.h">
+      <Filter>src\procinfo</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
