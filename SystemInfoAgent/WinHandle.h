@@ -88,5 +88,55 @@ namespace SystemInfoAgent::core
 
 	};	// class ComInitGuard 
 
+
+	class UniqueServiceHandle {
+	private:
+		SC_HANDLE handle_ = nullptr;
+
+	public:
+		UniqueServiceHandle() noexcept = default;
+		explicit UniqueServiceHandle(SC_HANDLE h) noexcept : handle_(h) {}
+		UniqueServiceHandle(const UniqueHandle&) = delete;				// Copy ctor
+		UniqueServiceHandle& operator=(const UniqueServiceHandle&) = delete;	// copy assignment op
+		UniqueServiceHandle(UniqueServiceHandle&& other) noexcept : handle_(other.handle_) { other.handle_ = nullptr; }	// Move ctor;
+
+		UniqueServiceHandle& operator=(UniqueServiceHandle&& other) noexcept	// move assignment op
+		{
+			if (this == &other) { return *this; }
+			reset(other.handle_);
+			other.handle_ = nullptr;
+			return *this;
+		}
+
+		~UniqueServiceHandle() { reset(); }		// dtor
+
+		// isValid
+		[[nodiscard]] bool valid() const noexcept
+		{
+			return (handle_ != nullptr && handle_ != INVALID_HANDLE_VALUE);
+		}
+
+		// get()
+		[[nodiscard]] SC_HANDLE get() const noexcept { return handle_; }
+
+		// reset()
+		void reset(SC_HANDLE h = nullptr) {
+			if (valid())
+			{
+				::CloseHandle(handle_);
+			}
+
+			handle_ = h;
+		}
+
+		// release()
+		SC_HANDLE release() noexcept {
+			SC_HANDLE h = handle_;
+			handle_ = nullptr;
+			return h;
+		}
+
+	};	// class UniqueServiceHandle
+
 }	// namespace SystemInfoAgent::core
 
