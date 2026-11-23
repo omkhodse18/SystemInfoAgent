@@ -25,7 +25,7 @@ namespace SystemInfoAgent::procinfo {
             );
             
             return value;
-        }
+        }   // toUpper
 
         // Queries WMI's Win32_Process class for each process's command line, since
         // the Toolhelp32 snapshot API does not expose it. Keyed by PID.
@@ -52,11 +52,11 @@ namespace SystemInfoAgent::procinfo {
 
             hr = ::CoSetProxyBlanket(services, RPC_C_AUTHN_WINNT, RPC_C_AUTHZ_NONE, nullptr, RPC_C_AUTHN_LEVEL_CALL, RPC_C_IMP_LEVEL_IMPERSONATE, nullptr, EOAC_NONE);
             if (FAILED(hr)) { return result; }
-                
+
             IEnumWbemClassObject* rawEnumerator = nullptr;
-            hr = services->ExecQuery(_bstr_t(L"WQL"), _bstr_t(L"SELECT ProcessId, CommandLine FROM Win32_Process"), 
+            hr = services->ExecQuery(_bstr_t(L"WQL"), _bstr_t(L"SELECT ProcessId, CommandLine FROM Win32_Process"),
                 WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &rawEnumerator);
-            
+
             if (FAILED(hr) || rawEnumerator == nullptr) { return result; }
 
             _COM_SMARTPTR_TYPEDEF(IEnumWbemClassObject, __uuidof(IEnumWbemClassObject));
@@ -102,47 +102,131 @@ namespace SystemInfoAgent::procinfo {
             return names;
         }   // criticalProcessNames() 
 
-        void queryVersionInfo(const std::wstring& path, std::wstring& companyName, std::wstring& fileDescription);
-        std::wstring queryOwningUser(DWORD pid);
 
-
-        uint64_t queryMemoryUsageKb(DWORD pid)
+        // This function fetch the version information from a Windows EXE/DLL.
+        void queryVersionInfo(const std::wstring& path, std::wstring& companyName, std::wstring& fileDescription)
         {
-            UniqueHandle process(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, pid));
-
-            if (!process.valid())
+            if (path.empty())
             {
-                return 0;
+                return;
             }
+
+            DWORD handle = 0;
+            DWORD dwSize = ::GetFileVersionInfoSizeW(path.c_str(), &handle);
+            if (dwSize == 0)
+            {
+                return;
+            }
+
+            std::vector<BYTE> buffer(dwSize);
+            if (!::GetFileVersionInfoW(path.c_str(), handle, dwSize, buffer.data()))
+            {      
+                return;
+            }
+
+            struct LangCodePage {
+                WORD language;
+                WORD codePage;
+            }*translations = nullptr;
+
+            UINT translationBytes = 0;
+            if (!::VerQueryValueW(buffer.data(), L"\\VarFileInfo\\Translation",
+                reinterpret_cast<LPVOID*>(&translations), &translationBytes) || translationBytes < sizeof(LangCodePage)) 
+            {
+                return;
+            }
+
+            wchar_t subBlock[64] = {};
+            swprintf_s(subBlock, L"\\StringFileInfo\\%04x%04x\\CompanyName", translations[0].language, translations[0].codePage);
+            
+            LPVOID value = nullptr;
+            UINT valueLen = 0;
+            if (::VerQueryValueW(buffer.data(), subBlock, &value, &valueLen) && valueLen > 0)
+            {
+                companyName.assign(static_cast<wchar_t*>(value));
+            }
+
+            swprintf_s(subBlock, L"\\StringFileInfo\\%04x%04x\\FileDescription", translations[0].language, translations[0].codePage);
+
+            value = nullptr;
+            valueLen = 0;
+            if (::VerQueryValueW(buffer.data(), subBlock, &value, &valueLen) && valueLen > 0) 
+            {
+                fileDescription.assign(static_cast<wchar_t*>(value));
+            }
+
+        }   // queryVersionInfo
+
+        std::wstring queryOwningUser(HANDLE process)
+        {
+
+            HANDLE rawToken = nullptr;
+
+            if (!::OpenProcessToken(process, TOKEN_QUERY, &rawToken))
+            {
+                return L"";
+            }
+
+            UniqueHandle token(rawToken);
+            DWORD dwNeededSize = 0;
+
+            if (!token.valid())
+            {
+                return L"";
+            }
+
+            ::GetTokenInformation(token.get(), TokenUser, nullptr, 0, &dwNeededSize);
+
+            if (dwNeededSize == 0)
+            {
+                return L"";
+            }
+
+            std::vector<BYTE> buffer(dwNeededSize);
+            if(!::GetTokenInformation(token.get(), TokenUser, buffer.data(), dwNeededSize, &dwNeededSize))
+            {
+                return L"";
+            }
+
+            auto* tokenUser = reinterpret_cast<TOKEN_USER*>(buffer.data());
+
+            wchar_t name[256] = {};
+            wchar_t domain[256] = {};
+            DWORD nameLen = 256;
+            DWORD domainLen = 256;
+            SID_NAME_USE sidType;
+            if (!::LookupAccountSidW(nullptr, tokenUser->User.Sid, name, &nameLen, domain, &domainLen, &sidType)) 
+            {
+                return L"";
+            }
+
+            return std::wstring(domain) + L"\\" + name;
+        }   // queryOwningUser
+
+
+        uint64_t queryMemoryUsageKb(HANDLE process)
+        {
 
             PROCESS_MEMORY_COUNTERS_EX counter{};
             DWORD dwSize = sizeof(counter);
 
-            if (!::GetProcessMemoryInfo(process.get(), reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&counter), dwSize))
+            if (!::GetProcessMemoryInfo(process, reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&counter), dwSize))
             {
                 return 0;
             }
 
             return ( (static_cast<uint64_t>(counter.WorkingSetSize)) / 1024 );
-        }
+        }   //queryMemoryUsageKb
 
 
         // queryImagePath - Get full process path
-        std::wstring queryImagePath(DWORD pid)
+        std::wstring queryImagePath(HANDLE process)
         {
-            UniqueHandle process(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid));
-
-            // Process is invalid, so return empty string.
-            if (!process.valid()) 
-            {
-                return L"";
-            }
-
             wchar_t buffer[MAX_PATH] = { };
             DWORD size = MAX_PATH;
 
             // Get full process path
-            if (!QueryFullProcessImageNameW(process.get(), false, buffer, &size))
+            if (!QueryFullProcessImageNameW(process, false, buffer, &size))
             {
                 return L"";     // Failed to fetch exe path so return empty string.
             }
@@ -153,7 +237,7 @@ namespace SystemInfoAgent::procinfo {
 
 	} // namespace
 
-	std::vector<ProcessInfo> snapshot()
+	std::vector<ProcessInfo> ProcessEnumerator::snapshot()
 	{
 		std::vector<ProcessInfo> vecRunningProcesses;
 
@@ -165,6 +249,7 @@ namespace SystemInfoAgent::procinfo {
 			return vecRunningProcesses;
 		}
 
+        // Prcess doesn't provide command lines, that why use com.
 		ComInitGuard comGuard;
 		std::unordered_map<DWORD, std::wstring> commandLines;
 
@@ -173,12 +258,14 @@ namespace SystemInfoAgent::procinfo {
 			commandLines = queryCommandLinesViaWmi();
 		}
 
+        // Critical or important system exe's. - DO NOT KILL OR BLOCK THEM.
         const auto& setCriticalProcesses = criticalProcessNames();
 
         PROCESSENTRY32W entry{};
-        entry.dwSize = sizeof(PROCESSENTRY32);
+        entry.dwSize = sizeof(PROCESSENTRY32W);
 
-        if (Process32FirstW(objProcessSnapshot.get(), &entry))
+        // START ITERATING PROCESS NOW.
+        if (!::Process32FirstW(objProcessSnapshot.get(), &entry))
         {
             return vecRunningProcesses;
         }
@@ -187,9 +274,17 @@ namespace SystemInfoAgent::procinfo {
             ProcessInfo info;
             info.pid = entry.th32ProcessID;
             info.name = entry.szExeFile;
-            info.path = queryImagePath(entry.th32ProcessID);                // gets exe path
-            info.memoryUsageKb = queryMemoryUsageKb(entry.th32ProcessID);   // Memory usage in kb
-            info.userName = queryOwningUser(entry.th32ProcessID);
+
+            // Opens process
+            UniqueHandle process(::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ, FALSE, entry.th32ProcessID));
+
+            if (process.valid())
+            {
+                info.path = queryImagePath(process.get());                // gets exe path
+                info.memoryUsageKb = queryMemoryUsageKb(process.get());   // Memory usage in kb
+                info.userName = queryOwningUser(process.get());           // Finds which Windows user account owns/runs that process
+            }
+
             info.isCritical = setCriticalProcesses.count(toUpper(info.name)) > 0;
 
             auto cmdIt = commandLines.find(entry.th32ProcessID);
@@ -199,7 +294,8 @@ namespace SystemInfoAgent::procinfo {
 
             queryVersionInfo(info.path, info.companyName, info.fileDescription);
 
-            vecRunningProcesses.push_back(std::move(info));
+            vecRunningProcesses.push_back(std::move(info));         // add in vector.
+
         } while (Process32NextW(objProcessSnapshot.get(), &entry));
 
 		return vecRunningProcesses;
