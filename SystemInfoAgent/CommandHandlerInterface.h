@@ -2,8 +2,12 @@
 
 #include "Command.h"
 
+#include "ScreenshotManager.h"
+
 namespace SystemInfoAgent::cli
 {
+	using SystemInfoAgent::Screenshot::ScreenshotManager;
+
 	class ICommandHandler
 	{
 	public:
@@ -11,9 +15,17 @@ namespace SystemInfoAgent::cli
 		virtual int run(const Command& command) = 0;
 	};
 
-	class Screenshot : public ICommandHandler
+	class ScreenshotHandler : public ICommandHandler
 	{
-
+	public:
+		
+		//bool ScreenshotManager::capture(const std::wstring& outputPath)
+		int run(const Command& command) override
+		{
+			ScreenshotManager objScreenshotManager;
+			bool isCaptured = objScreenshotManager.capture(L"C:\\SystemInfoAgent\\");
+			return isCaptured;
+		}
 	};
 
 }
