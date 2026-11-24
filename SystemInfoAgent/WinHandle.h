@@ -123,7 +123,7 @@ namespace SystemInfoAgent::core
 		void reset(SC_HANDLE h = nullptr) {
 			if (valid())
 			{
-				::CloseHandle(handle_);
+				::CloseServiceHandle(handle_);
 			}
 
 			handle_ = h;
