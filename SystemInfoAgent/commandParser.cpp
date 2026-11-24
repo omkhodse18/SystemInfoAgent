@@ -91,6 +91,10 @@ namespace SystemInfoAgent::cli
         {
             cmd.mode = Mode::InstallAppReport;
         }
+        else if (flag == L"/screenshot")
+        {
+            cmd.mode = Mode::Screenshot;
+        } 
         else {
             cmd.mode = Mode::Unknown;
         }

@@ -22,8 +22,11 @@ namespace SystemInfoAgent::cli {
         EnableWindowsUpdatePopups,  // /enablewinupd
         DisableWindowsUpdatePopups, // /disablewinupd
 
+        // Screenshot
+        Screenshot,                 // /screenshot
+
         // App report
-        InstallAppReport, // /install-app-report  -- full installed-software scan/diff/report
+        InstallAppReport,           // /install-app-report  -- full installed-software scan/diff/report
     };
 
 struct Command {
