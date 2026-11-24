@@ -11,7 +11,10 @@
     <Filter Include="src\core">
       <UniqueIdentifier>{da26fca7-fc4e-49e0-b05a-ba2d102c8acf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\procinfo">
+    <Filter Include="src\screenshot">
+      <UniqueIdentifier>{5b1f8c86-4d08-42e0-9c5e-37c7a6ab6539}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\process">
       <UniqueIdentifier>{72c1da26-27b7-464b-a58e-074724a6015c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -24,16 +27,19 @@
     </ClCompile>
     <ClCompile Include="SystemInfoAgent.cpp" />
     <ClCompile Include="ProcessEnumerator.cpp">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
     </ClCompile>
     <ClCompile Include="ProcessActions.cpp">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
     </ClCompile>
     <ClCompile Include="RegistryKey.cpp">
       <Filter>src\core</Filter>
     </ClCompile>
     <ClCompile Include="ServiceControl.cpp">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenshotManager.cpp">
+      <Filter>src\screenshot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -44,10 +50,10 @@
       <Filter>src\core</Filter>
     </ClInclude>
     <ClInclude Include="ProcessInfo.h">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
     </ClInclude>
     <ClInclude Include="ProcessEnumerator.h">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
     </ClInclude>
     <ClInclude Include="WinHandle.h">
       <Filter>src\core</Filter>
@@ -56,13 +62,19 @@
       <Filter>src\cli</Filter>
     </ClInclude>
     <ClInclude Include="ProcessActions.h">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
     </ClInclude>
     <ClInclude Include="RegistryKey.h">
       <Filter>src\core</Filter>
     </ClInclude>
     <ClInclude Include="ServiceControl.h">
-      <Filter>src\procinfo</Filter>
+      <Filter>src\process</Filter>
+    </ClInclude>
+    <ClInclude Include="ScreenshotManager.h">
+      <Filter>src\screenshot</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHandlerInterface.h">
+      <Filter>src\cli</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

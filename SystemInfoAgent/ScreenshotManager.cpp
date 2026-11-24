@@ -101,7 +101,7 @@ namespace SystemInfoAgent::Screenshot
             monitors->push_back(*rect);
             return TRUE;
         }
-    }
+    }   // namespace
 
     bool ScreenshotManager::capture(const std::wstring& outputPath)
     {

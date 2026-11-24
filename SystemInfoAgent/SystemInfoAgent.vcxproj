@@ -167,17 +167,20 @@
     <ClCompile Include="ProcessActions.cpp" />
     <ClCompile Include="ProcessEnumerator.cpp" />
     <ClCompile Include="RegistryKey.cpp" />
+    <ClCompile Include="ScreenshotManager.cpp" />
     <ClCompile Include="ServiceControl.cpp" />
     <ClCompile Include="StringUtil.cpp" />
     <ClCompile Include="SystemInfoAgent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.h" />
+    <ClInclude Include="CommandHandlerInterface.h" />
     <ClInclude Include="commandParser.h" />
     <ClInclude Include="ProcessActions.h" />
     <ClInclude Include="ProcessEnumerator.h" />
     <ClInclude Include="ProcessInfo.h" />
     <ClInclude Include="RegistryKey.h" />
+    <ClInclude Include="ScreenshotManager.h" />
     <ClInclude Include="ServiceControl.h" />
     <ClInclude Include="StringUtil.h" />
     <ClInclude Include="WinHandle.h" />
