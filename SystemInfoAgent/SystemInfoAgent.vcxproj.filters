@@ -17,6 +17,9 @@
     <Filter Include="src\process">
       <UniqueIdentifier>{72c1da26-27b7-464b-a58e-074724a6015c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\install_softwares">
+      <UniqueIdentifier>{35d97105-ebee-4167-acae-ea9b9c05d18a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="commandParser.cpp">
@@ -40,6 +43,9 @@
     </ClCompile>
     <ClCompile Include="ScreenshotManager.cpp">
       <Filter>src\screenshot</Filter>
+    </ClCompile>
+    <ClCompile Include="InstallApplicationScanner.cpp">
+      <Filter>src\install_softwares</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -75,6 +81,12 @@
     </ClInclude>
     <ClInclude Include="CommandHandlerInterface.h">
       <Filter>src\cli</Filter>
+    </ClInclude>
+    <ClInclude Include="InstallApplicationScanner.h">
+      <Filter>src\install_softwares</Filter>
+    </ClInclude>
+    <ClInclude Include="AppInfo.h">
+      <Filter>src\install_softwares</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

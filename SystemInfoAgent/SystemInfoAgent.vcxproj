@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="commandParser.cpp" />
+    <ClCompile Include="InstallApplicationScanner.cpp" />
     <ClCompile Include="ProcessActions.cpp" />
     <ClCompile Include="ProcessEnumerator.cpp" />
     <ClCompile Include="RegistryKey.cpp" />
@@ -173,9 +174,11 @@
     <ClCompile Include="SystemInfoAgent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppInfo.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandHandlerInterface.h" />
     <ClInclude Include="commandParser.h" />
+    <ClInclude Include="InstallApplicationScanner.h" />
     <ClInclude Include="ProcessActions.h" />
     <ClInclude Include="ProcessEnumerator.h" />
     <ClInclude Include="ProcessInfo.h" />
